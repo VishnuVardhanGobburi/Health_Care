@@ -8,7 +8,7 @@ import pandas as pd
 
 
 def kpi_strip(df: pd.DataFrame) -> dict[str, float | int]:
-    """Row count, median charges, P95 charges, smoker percentage."""
+    """Row count, median charges, 95th percentile charges, smoker percentage."""
     out: dict[str, float | int] = {"row_count": len(df)}
     if "charges" in df.columns:
         out["median_charges"] = float(df["charges"].median())
@@ -24,7 +24,7 @@ def kpi_strip(df: pd.DataFrame) -> dict[str, float | int]:
 
 
 def charge_percentiles(df: pd.DataFrame) -> dict[str, float]:
-    """P50, P75, P90, P95, P99 for charges."""
+    """50th, 75th, 90th, 95th, 99th percentile for charges."""
     if "charges" not in df.columns:
         return {}
     s = df["charges"].dropna()

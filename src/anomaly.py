@@ -14,7 +14,7 @@ def flag_anomalies_charges(
 ) -> tuple[pd.Series, pd.DataFrame]:
     """
     Flag rows as anomalous based on charges.
-    method: "percentile" (e.g. > P95) or "iqr" (above Q3 + iqr_mult * IQR).
+    method: "percentile" (e.g. > 95th Percentile) or "iqr" (above Q3 + iqr_mult * IQR).
     Returns (boolean mask, table of flagged rows with reason).
     """
     if "charges" not in df.columns:
@@ -24,7 +24,7 @@ def flag_anomalies_charges(
     if method == "percentile":
         thresh = charges.quantile(percentile / 100.0)
         mask = df["charges"] > thresh
-        reason = f"> P{int(percentile)}"
+        reason = f"> {int(percentile)}th Percentile"
     else:
         q1, q3 = charges.quantile(0.25), charges.quantile(0.75)
         iqr = q3 - q1

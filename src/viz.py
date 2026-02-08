@@ -34,10 +34,10 @@ def _apply_layout(fig: go.Figure, title: str, yaxis_title: str | None = None, xa
 
 
 def charges_boxplot(df: pd.DataFrame) -> go.Figure:
-    """Boxplot of charges (target) — takeaway: spread and outliers."""
+    """Boxplot of charges — spread and outliers."""
     fig = go.Figure(go.Box(y=df["charges"].dropna(), name="Charges", line_color="rgb(31, 119, 180)"))
     fig.update_layout(
-        title=dict(text="Charges show a long right tail — high-cost cases pull the average up", x=0.5, xanchor="center"),
+        title=dict(text="", x=0.5, xanchor="center"),
         yaxis_title="Charges (USD)",
         **LAYOUT_DEFAULTS,
     )
@@ -47,7 +47,7 @@ def charges_boxplot(df: pd.DataFrame) -> go.Figure:
 def charges_histogram(df: pd.DataFrame) -> go.Figure:
     """Distribution of charges with minimal styling."""
     fig = go.Figure(go.Histogram(x=df["charges"].dropna(), nbinsx=50, marker_color="rgb(31, 119, 180)"))
-    _apply_layout(fig, "Most claims cluster at lower charges; a minority drive very high cost", "Count", "Charges (USD)")
+    _apply_layout(fig, "", "Count", "Charges (USD)")
     return fig
 
 
@@ -60,7 +60,7 @@ def numeric_boxplots(df: pd.DataFrame) -> go.Figure:
     for c in cols:
         fig.add_trace(go.Box(y=df[c].dropna(), name=c.replace("_", " ").title()))
     fig.update_layout(
-        title=dict(text="Numeric features: spread and potential outliers", x=0.5, xanchor="center"),
+        title=dict(text="", x=0.5, xanchor="center"),
         yaxis_title="Value",
         **LAYOUT_DEFAULTS,
     )
@@ -70,16 +70,23 @@ def numeric_boxplots(df: pd.DataFrame) -> go.Figure:
 # ---------- Phase 2: Cost story ----------
 
 
+def _percentile_display_label(key: str) -> str:
+    """Convert p50 -> 50th Percentile, p95 -> 95th Percentile, etc."""
+    if key.startswith("p") and key[1:].isdigit():
+        return f"{key[1:]}th Percentile"
+    return key
+
+
 def charges_distribution_percentiles(
     df: pd.DataFrame, percentiles: dict[str, float]
 ) -> go.Figure:
-    """Charges distribution with P50, P75, P90, P95, P99 markers."""
-    fig = go.Figure(go.Histogram(x=df["charges"].dropna(), nbinsx=60, marker_color="rgb(31, 119, 180)"))
+    """Charges distribution with 50th–99th Percentile markers."""
+    fig = go.Figure(go.Histogram(x=df["charges"].dropna(), nbinsx=60, marker_color="rgb(31, 119, 180)", showlegend=False))
     for label, val in percentiles.items():
-        fig.add_vline(x=val, line_dash="dash", line_color="gray", annotation_text=label)
+        fig.add_vline(x=val, line_dash="dash", line_color="gray", annotation_text=_percentile_display_label(label))
     _apply_layout(
         fig,
-        "A small share of claims drives most cost — long-tail risk matters for monitoring",
+        "",
         "Count",
         "Charges (USD)",
     )
@@ -95,7 +102,7 @@ def charges_by_smoker_box(df: pd.DataFrame) -> go.Figure:
     fig = px.box(df, x="smoker_label", y="charges", color="smoker_label", points="outliers")
     fig.update_layout(
         title=dict(
-            text="Smoking status dominates high-cost risk — averages are misleading",
+            text="",
             x=0.5,
             xanchor="center",
         ),
@@ -121,7 +128,7 @@ def age_vs_charges_scatter(df: pd.DataFrame) -> go.Figure:
     fig.update_traces(marker=dict(size=6, opacity=0.7))
     _apply_layout(
         fig,
-        "Risk compounds with age, especially for smokers",
+        "",
         "Charges (USD)",
         "Age",
     )
@@ -134,7 +141,7 @@ def bmi_vs_charges_scatter(df: pd.DataFrame) -> go.Figure:
     fig.update_traces(marker=dict(size=6, color="rgb(31, 119, 180)"))
     _apply_layout(
         fig,
-        "BMI alone is not the main driver of cost",
+        "BMI vs charges",
         "Charges (USD)",
         "BMI",
     )
@@ -142,7 +149,7 @@ def bmi_vs_charges_scatter(df: pd.DataFrame) -> go.Figure:
 
 
 def bmi_vs_charges_by_smoker(df: pd.DataFrame) -> go.Figure:
-    """BMI vs charges split by smoker (interaction view)."""
+    """BMI vs charges"""
     df = df.copy()
     df["Smoker"] = df["smoker"].astype(str).str.lower().str.strip().map(
         lambda x: "Smoker" if x in ("yes", "true", "1") else "Non-smoker"
@@ -155,7 +162,7 @@ def bmi_vs_charges_by_smoker(df: pd.DataFrame) -> go.Figure:
     fig.update_traces(marker=dict(size=5, opacity=0.6))
     _apply_layout(
         fig,
-        "BMI vs charges by smoking status — interaction view",
+        "BMI vs charges by smoking status",
         "Charges (USD)",
         "BMI",
     )
@@ -168,7 +175,7 @@ def region_charges_box(df: pd.DataFrame) -> go.Figure:
     fig.update_traces(marker_color="rgb(31, 119, 180)")
     _apply_layout(
         fig,
-        "Regional effects are secondary to smoking and age",
+        "Region vs charges",
         "Charges (USD)",
         "Region",
     )
@@ -181,9 +188,24 @@ def sex_charges_box(df: pd.DataFrame) -> go.Figure:
     fig.update_traces(marker_color="rgb(31, 119, 180)")
     _apply_layout(
         fig,
-        "Sex shows smaller differences than smoking or age",
+        "Sex vs charges",
         "Charges (USD)",
         "Sex",
+    )
+    return fig
+
+
+def children_charges_box(df: pd.DataFrame) -> go.Figure:
+    """Box plot of charges by number of children (discrete category)."""
+    df = df.copy()
+    df["children_cat"] = df["children"].astype(int).astype(str)
+    fig = px.box(df, x="children_cat", y="charges", points="outliers")
+    fig.update_traces(marker_color="rgb(31, 119, 180)")
+    fig.update_layout(
+        title=dict(text="Charges by number of children", x=0.5, xanchor="center"),
+        xaxis_title="Number of children",
+        yaxis_title="Charges (USD)",
+        **LAYOUT_DEFAULTS,
     )
     return fig
 

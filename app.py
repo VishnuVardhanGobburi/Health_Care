@@ -11,39 +11,37 @@ st.set_page_config(
     initial_sidebar_state="auto",
 )
 
-# Sidebar navigation
-st.sidebar.title("📊 Insurance Analytics")
-st.sidebar.markdown("Story-driven insights and FAQ assistant.")
-page = st.sidebar.radio(
-    "Go to",
-    [
-        "1. Context & Big Idea",
-        "2. Data Quality & Integrity",
-        "3. Cost Story",
-        "4. Anomalies: Flag, Don't Delete",
-        "5. Insurance FAQ Assistant",
-        "6. Accuracy & Hallucination Testing",
-    ],
-    label_visibility="collapsed",
+# Global typography: smaller, dashboard-like headings across all pages
+st.markdown(
+    """
+    <style>
+    /* Page title (st.title) */
+    h1 { font-size: 1.8rem; margin-bottom: 0.4rem; }
+
+    /* Section headers (st.header) */
+    h2 { font-size: 1.3rem; margin-top: 1.2rem; margin-bottom: 0.35rem; }
+
+    /* Subheaders (st.subheader) */
+    h3 { font-size: 1.1rem; margin-top: 0.8rem; margin-bottom: 0.3rem; }
+
+    /* Optional: body text readability */
+    p  { font-size: 0.95rem; line-height: 1.5; }
+    </style>
+    """,
+    unsafe_allow_html=True,
 )
 
-# Route to page modules
-PAGES = {
-    "1. Context & Big Idea": "pages.one_context",
-    "2. Data Quality & Integrity": "pages.two_quality",
-    "3. Cost Story": "pages.three_cost",
-    "4. Anomalies: Flag, Don't Delete": "pages.four_anomaly",
-    "5. Insurance FAQ Assistant": "pages.five_chatbot",
-    "6. Accuracy & Hallucination Testing": "pages.six_testing",
-}
+st.sidebar.title("📊 Insurance Analytics")
+st.sidebar.markdown("Story-driven insights and FAQ assistant.")
 
-
-def main():
-    mod_name = PAGES.get(page, "pages.one_context")
-    import importlib
-    mod = importlib.import_module(mod_name)
-    mod.render()
-
-
-if __name__ == "__main__":
-    main()
+pages = [
+    st.Page("pages/context_big_idea.py", title="Context & Big Idea"),
+    st.Page("pages/data_quality_integrity.py", title="Data Quality & Integrity"),
+    st.Page("pages/cost_story.py", title="Drivers of Insurance Claim Costs"),
+    st.Page("pages/anomalies_flag_dont_delete.py", title="High-Charge Claim Review (Flag, Don't Delete)"),
+    st.Page("pages/high_charge_risk_estimator.py", title="High-Charge Risk Estimator"),
+    st.Page("pages/insurance_faq_assistant.py", title="Insurance FAQ Assistant"),
+    st.Page("pages/accuracy_hallucination_testing.py", title="Accuracy & Hallucination Testing"),
+]
+pg = st.navigation(pages)
+pg.run()

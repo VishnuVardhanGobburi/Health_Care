@@ -6,10 +6,10 @@ Built for the Delta Dental Artificial Intelligence Internship, following *Storyt
 
 ## Features
 
-- **Context & Big Idea** — Executive intro, KPIs (row count, median/P95 charges, smoker %)
+- **Context & Big Idea** — Executive intro, KPIs (row count, median/95th percentile charges, smoker %)
 - **Data Quality & Integrity** — Schema validation, missing values, range checks, boxplots and distributions
 - **Cost Story** — Sequential narrative: percentiles, smoking, age, BMI, region/sex
-- **Anomalies** — Flag high-cost cases (e.g. P95 or IQR); scatter and histogram; sortable table
+- **Anomalies** — Flag high-cost cases (e.g. 95th Percentile or IQR); scatter and histogram; review summary
 - **Insurance FAQ Assistant** — RAG chatbot (FAQ/policy only); suggested questions; sources cited
 - **Accuracy & Hallucination Testing** — Out-of-scope refusal, source grounding, consistency checks
 
@@ -60,14 +60,14 @@ streamlit run app.py
 
 ```
 Health_Care/
-├── app.py                 # Entry point, sidebar navigation
+├── app.py                              # Entry point, st.navigation
 ├── pages/
-│   ├── one_context.py     # Page 1 — Context & Big Idea
-│   ├── two_quality.py     # Page 2 — Data Quality
-│   ├── three_cost.py      # Page 3 — Cost Story
-│   ├── four_anomaly.py    # Page 4 — Anomalies
-│   ├── five_chatbot.py    # Page 5 — FAQ RAG chatbot
-│   └── six_testing.py     # Page 6 — Accuracy & hallucination tests
+│   ├── context_big_idea.py             # Context & Big Idea
+│   ├── data_quality_integrity.py       # Data Quality & Integrity
+│   ├── cost_story.py                   # Cost Story
+│   ├── anomalies_flag_dont_delete.py # Anomalies: Flag, Don't Delete
+│   ├── insurance_faq_assistant.py      # Insurance FAQ Assistant
+│   └── accuracy_hallucination_testing.py # Accuracy & Hallucination Testing
 ├── src/
 │   ├── data.py            # Load, validate, clean (fixed paths)
 │   ├── metrics.py         # KPIs, percentiles, summaries
