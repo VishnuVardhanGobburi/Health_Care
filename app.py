@@ -31,15 +31,15 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-st.sidebar.title("📊 Insurance Analytics")
-st.sidebar.markdown("Story-driven insights and FAQ assistant.")
+st.sidebar.title("Insurance Analytics")
+st.sidebar.markdown("Story-driven insights and FAQ AI assistant.")
 
 pages = [
-    st.Page("pages/context_big_idea.py", title="Context & Big Idea"),
-    st.Page("pages/data_quality_integrity.py", title="Data Quality & Integrity"),
+    st.Page("pages/context_big_idea.py", title="Context & Objectives"),
     st.Page("pages/cost_story.py", title="Drivers of Insurance Claim Costs"),
-    st.Page("pages/anomalies_flag_dont_delete.py", title="High-Charge Claim Review (Flag, Don't Delete)"),
+    st.Page("pages/anomalies_flag_dont_delete.py", title="High-Charge Claim Review"),
     st.Page("pages/high_charge_risk_estimator.py", title="High-Charge Risk Estimator"),
+    st.Page("pages/data_quality_integrity.py", title="Data Quality & Integrity"),
     st.Page("pages/insurance_faq_assistant.py", title="Insurance FAQ Assistant"),
     st.Page("pages/accuracy_hallucination_testing.py", title="Accuracy & Hallucination Testing"),
 ]

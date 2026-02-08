@@ -36,7 +36,7 @@ def render():
     st.title("Insurance FAQ Assistant")
     st.markdown(
         "Ask about insurance concepts, policies, and definitions (e.g. copay, deductible, coinsurance). "
-        "Answers are grounded in the provided FAQ documents. This assistant does **not** compute metrics or interpret dashboards."
+        "Answers are grounded in the provided FAQ documents."
     )
     api_key = _get_api_key()
     if not api_key:

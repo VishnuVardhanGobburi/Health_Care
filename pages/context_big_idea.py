@@ -41,7 +41,7 @@ def render():
     st.markdown("This project is designed for:")
     st.markdown("- **Claims analysts** who need to identify and review high-risk claims efficiently.")
     st.markdown("- **Business stakeholders and managers** who rely on analytics to translate raw claims data into decisions.")
-    st.markdown("**Non-technical users and policy stakeholders** who need quick, reliable answers to insurance-related questions through an AI-driven, document-grounded FAQ assistant")
+    st.markdown("- **Non-technical users and policy stakeholders** who need quick, reliable answers to insurance-related questions through an AI-driven, document-grounded FAQ assistant")
     st.subheader("What each page does")
     st.markdown("- **Data Quality & Integrity:** Ensures the data is trustworthy by validating ranges, categories, and distributions before analysis." )
     st.markdown("- **Drivers of Insurance Claim Costs:** Explores how claim charges vary across smoking status, age, BMI, region, and demographics using distribution-focused visuals." )

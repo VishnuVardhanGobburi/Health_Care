@@ -37,7 +37,7 @@ def charges_boxplot(df: pd.DataFrame) -> go.Figure:
     """Boxplot of charges — spread and outliers."""
     fig = go.Figure(go.Box(y=df["charges"].dropna(), name="Charges", line_color="rgb(31, 119, 180)"))
     fig.update_layout(
-        title=dict(text="", x=0.5, xanchor="center"),
+        title=dict(text="Spread", x=0.5, xanchor="center"),
         yaxis_title="Charges (USD)",
         **LAYOUT_DEFAULTS,
     )
@@ -46,8 +46,8 @@ def charges_boxplot(df: pd.DataFrame) -> go.Figure:
 
 def charges_histogram(df: pd.DataFrame) -> go.Figure:
     """Distribution of charges with minimal styling."""
-    fig = go.Figure(go.Histogram(x=df["charges"].dropna(), nbinsx=50, marker_color="rgb(31, 119, 180)"))
-    _apply_layout(fig, "", "Count", "Charges (USD)")
+    fig = go.Figure(go.Histogram(x=df["charges"].dropna(), nbinsx=50, marker_color="rgb(31, 119, 180)", showlegend=False))
+    _apply_layout(fig, "Distribution", "Count", "Charges (USD)")
     return fig
 
 
