@@ -67,42 +67,53 @@ def render():
     flagged_copy = flagged.copy()
     flagged_copy["smoker_label"] = _smoker_label(flagged_copy["smoker"])
 
-    # 1) Smoking status
+    # Build summary dataframes
     smoker_counts = flagged_copy["smoker_label"].value_counts().reindex(["Yes", "No"], fill_value=0)
     smoker_pct = (100 * smoker_counts / n_flagged).round(1)
-    st.caption("Smoking status (flagged subset)")
-    st.dataframe(pd.DataFrame({"Smoking": smoker_counts.index, "Count": smoker_counts.values, "% of flagged": smoker_pct.values}), use_container_width=True, hide_index=True)
+    df_smoker = pd.DataFrame({"Smoking": smoker_counts.index, "Count": smoker_counts.values, "% of flagged": smoker_pct.values})
 
-    # 2) Age buckets (age < cutoff vs age >= cutoff)
     below = (flagged_copy["age"] < age_cutoff).sum()
     above = (flagged_copy["age"] >= age_cutoff).sum()
-    st.caption(f"Age (cutoff = {age_cutoff:.0f}, median age of full dataset)")
-    st.dataframe(pd.DataFrame({
+    df_age = pd.DataFrame({
         "Category": [f"Age < {age_cutoff:.0f}", f"Age ≥ {age_cutoff:.0f}"],
         "Count": [below, above],
         "% of flagged": [round(100 * below / n_flagged, 1), round(100 * above / n_flagged, 1)]
-    }), use_container_width=True, hide_index=True)
+    })
 
-    # 3) BMI buckets (<25, 25–29.9, 30–34.9, 35+)
     flagged_copy["bmi_bucket"] = flagged_copy["bmi"].map(_bmi_bucket)
     bmi_order = ["<25", "25–29.9", "30–34.9", "35+"]
-    bmi_counts = flagged_copy["bmi_bucket"].value_counts()
-    bmi_counts = bmi_counts.reindex(bmi_order, fill_value=0)
+    bmi_counts = flagged_copy["bmi_bucket"].value_counts().reindex(bmi_order, fill_value=0)
     bmi_pct = (100 * bmi_counts / n_flagged).round(1)
-    st.caption("BMI category")
-    st.dataframe(pd.DataFrame({"BMI": bmi_counts.index, "Count": bmi_counts.values, "% of flagged": bmi_pct.values}), use_container_width=True, hide_index=True)
+    df_bmi = pd.DataFrame({"BMI": bmi_counts.index, "Count": bmi_counts.values, "% of flagged": bmi_pct.values})
 
-    # 4) Region counts
     region_counts = flagged_copy["region"].astype(str).str.strip().value_counts()
     region_pct = (100 * region_counts / n_flagged).round(1)
-    st.caption("Region")
-    st.dataframe(pd.DataFrame({"Region": region_counts.index, "Count": region_counts.values, "% of flagged": region_pct.values}), use_container_width=True, hide_index=True)
+    df_region = pd.DataFrame({"Region": region_counts.index, "Count": region_counts.values, "% of flagged": region_pct.values})
 
-    # 5) Children counts
     children_counts = flagged_copy["children"].astype(int).value_counts().sort_index()
     children_pct = (100 * children_counts / n_flagged).round(1)
-    st.caption("Number of children")
-    st.dataframe(pd.DataFrame({"Children": children_counts.index, "Count": children_counts.values, "% of flagged": children_pct.values}), use_container_width=True, hide_index=True)
+    df_children = pd.DataFrame({"Children": children_counts.index, "Count": children_counts.values, "% of flagged": children_pct.values})
+
+    # Row 1: Smoking, Age, BMI
+    r1_c1, r1_c2, r1_c3 = st.columns(3)
+    with r1_c1:
+        st.caption("Smoking status (flagged subset)")
+        st.dataframe(df_smoker, use_container_width=True, hide_index=True)
+    with r1_c2:
+        st.caption(f"Age (cutoff = {age_cutoff:.0f}, median age of full dataset)")
+        st.dataframe(df_age, use_container_width=True, hide_index=True)
+    with r1_c3:
+        st.caption("BMI category")
+        st.dataframe(df_bmi, use_container_width=True, hide_index=True)
+
+    # Row 2: Region, Children
+    r2_c1, r2_c2 = st.columns(2)
+    with r2_c1:
+        st.caption("Region")
+        st.dataframe(df_region, use_container_width=True, hide_index=True)
+    with r2_c2:
+        st.caption("Number of children")
+        st.dataframe(df_children, use_container_width=True, hide_index=True)
 
     # PART B — Unexpected flagged records for review (at least 2 low-risk conditions)
     st.subheader("Records to Review: Unexpected Profiles")

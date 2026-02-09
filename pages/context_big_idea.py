@@ -1,55 +1,192 @@
 """Context & Big Idea."""
 import streamlit as st
 
-from src.data import load_medical_insurance
-from src.metrics import kpi_strip
+# =========================================================
+# STYLES (colored edges + same layout)
+# =========================================================
+st.markdown("""
+<style>
+/* Section headers - same font/weight as global app headings */
+.section-title{
+  font-size: 1.45rem;
+  font-weight: 500;
+  margin: 8px 0 24px 0;
+  letter-spacing: -0.4px;
+}
+.subheader {
+  font-size: 1.15rem;
+  font-weight: 500;
+  margin: 26px 0 18px 0;
+}
 
+/* Shared card */
+.card {
+  background-color: #ffffff;
+  border-radius: 12px;
+  padding: 16px 18px;
+  margin-bottom: 28px;          /* row gap */
+  height: 100%;
 
-@st.cache_data
-def _load_data():
-    return load_medical_insurance()
+  /* base shadow + subtle edge line */
+  box-shadow:
+    0 6px 20px rgba(0,0,0,0.06),
+    inset 0 0 0 1px rgba(0,0,0,0.04);
 
+  /* colored edge (default indigo) */
+  border-left: 6px solid #4f46e5;
+}
 
-@st.cache_data
-def _kpis(df):
-    return kpi_strip(df)
+/* Card text - aligned with subheader weight/size */
+.card h4 {
+  font-size: 1rem;
+  font-weight: 500;
+  margin: 0 0 8px 0;
+}
+.card p {
+  font-size: 0.9rem;
+  line-height: 1.4;
+  margin: 0;
+  white-space: nowrap;          /* 1-line */
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
 
+/* Metric cards */
+.metric-label{
+  font-size: 0.85rem;
+  font-weight: 400;
+  opacity: 0.85;
+  margin: 0 0 6px 0;
+}
+.metric-value{
+  font-size: 1.5rem;
+  font-weight: 500;
+  margin: 0;
+  letter-spacing: -0.2px;
+}
 
+/* Multi-line text cards */
+.wrap p{
+  white-space: normal;          /* allow wrapping */
+}
+
+/* Optional spacing helper */
+.small-gap{
+  margin-top: 6px;
+}
+
+/* ---------- Color variants (edges + soft glow) ---------- */
+.metric {
+  background: linear-gradient(135deg, #f8fafc, #eef2ff);
+  border-left-color: #4f46e5;
+  box-shadow:
+    0 6px 20px rgba(79,70,229,0.18),
+    inset 0 0 0 1px rgba(79,70,229,0.12);
+}
+
+.problem{
+  border-left-color: #ef4444;
+  box-shadow:
+    0 6px 20px rgba(239,68,68,0.18),
+    inset 0 0 0 1px rgba(239,68,68,0.12);
+}
+
+/* renamed meaning: use same green style for "What this project does" */
+.solution{
+  border-left-color: #22c55e;
+  box-shadow:
+    0 6px 20px rgba(34,197,94,0.18),
+    inset 0 0 0 1px rgba(34,197,94,0.12);
+}
+
+.role-business{
+  border-left-color: #f59e0b;
+  box-shadow:
+    0 6px 20px rgba(245,158,11,0.18),
+    inset 0 0 0 1px rgba(245,158,11,0.12);
+}
+.role-policy{
+  border-left-color: #10b981;
+  box-shadow:
+    0 6px 20px rgba(16,185,129,0.18),
+    inset 0 0 0 1px rgba(16,185,129,0.12);
+}
+
+/* page cards */
+.page{
+  border-left-color: #4f46e5;
+  box-shadow:
+    0 6px 20px rgba(79,70,229,0.18),
+    inset 0 0 0 1px rgba(79,70,229,0.12);
+}
+
+/* Hover */
+.card:hover{
+  transform: translateY(-3px);
+  transition: all 0.2s ease-in-out;
+}
+</style>
+""", unsafe_allow_html=True)
+
+# =========================================================
+# RENDER
+# =========================================================
 def render():
-    st.title("Insurance Claim Risk: Context & Objectives")
-    try:
-        df = _load_data()
-        kpis = _kpis(df)
-    except Exception as e:
-        st.error(f"Could not load data. {e}")
-        return
-    st.subheader("Key Metrics")
-    c1, c2, c3, c4 = st.columns(4)
-    c1.metric("Row count", f"{kpis['row_count']:,}")
-    c2.metric("Median charges", f"${kpis['median_charges']:,.0f}")
-    c3.metric("95th Percentile charges", f"${kpis['p95_charges']:,.0f}")
-    c4.metric("Smoker %", f"{kpis['smoker_pct']:.1f}%")
+    # -------------------------
+    # Title
+    # -------------------------
+    st.markdown('<div class="section-title">Insurance Claim Risk: Context & Objectives</div>', unsafe_allow_html=True)
 
-    st.subheader("ProblemStatement:")
-    st.markdown(
-        "Insurance claim data is highly skewed. Most claims are relatively low cost, while a small number of claims account for disproportionately high charges. " \
-        "Relying on averages often hides this imbalance, making it difficult to analyse to understand where risk truly concentrates or how to prioritize review efforts."
+    # -------------------------
+    # Problem -> What this project does (top row, 2 cards)
+    # -------------------------
+    top1, top2 = st.columns(2)
+
+    problem_text = (
+        "Insurance claim data is highly skewed. Most claims are relatively low cost, "
+        "while a small number account for disproportionately high charges. Relying on averages "
+        "hides this imbalance, making it hard to see where risk concentrates or how to prioritize review."
     )
-    st.subheader("What this project does")
-    st.markdown("This project provides a structured, end-to-end view of insurance claim risk by combining data quality checks, exploratory analysis, anomaly flagging, predictive modeling, and an AI-driven FAQ assistant into a single, coherent workflow.")
-    st.subheader("Who this is for")
-    st.markdown("This project is designed for:")
-    st.markdown("- **Claims analysts** who need to identify and review high-risk claims efficiently.")
-    st.markdown("- **Business stakeholders and managers** who rely on analytics to translate raw claims data into decisions.")
-    st.markdown("- **Non-technical users and policy stakeholders** who need quick, reliable answers to insurance-related questions through an AI-driven, document-grounded FAQ assistant")
-    st.subheader("What each page does")
-    st.markdown("- **Data Quality & Integrity:** Ensures the data is trustworthy by validating ranges, categories, and distributions before analysis." )
-    st.markdown("- **Drivers of Insurance Claim Costs:** Explores how claim charges vary across smoking status, age, BMI, region, and demographics using distribution-focused visuals." )
-    st.markdown("- **High-Charge Claim Review:** Flags unusually high claims using percentile- and IQR-based rules to support targeted review." )
-    st.markdown("- **High-Charge Risk Estimator:** Uses interpretable machine-learning models to estimate high-charge risk, compare trade-offs, and explain which factors drive predictions." )
-    st.markdown("- **Insurance FAQ Assistant (AI-driven):** Provides a document-grounded conversational interface to answer insurance-related questions with reduced hallucination risk." )
-    st.markdown("- **Accuracy & Hallucination Testing**: Evaluates AI responses to ensure reliability and document-grounded answers." )
 
+    project_text = (
+        "Provides an end-to-end view of claim risk by combining data quality checks, exploratory analysis, "
+        "high-charge flagging, predictive modeling, and an AI FAQ assistant into one workflow."
+    )
 
-if __name__ in ("__main__", "__page__"):
-    render()
+    with top1:
+        st.markdown(f"""
+        <div class="card wrap problem">
+          <h4>Problem Statement</h4>
+          <p>{problem_text}</p>
+        </div>
+        """, unsafe_allow_html=True)
+
+    with top2:
+        st.markdown(f"""
+        <div class="card wrap solution">
+          <h4>What this project does</h4>
+          <p>{project_text}</p>
+        </div>
+        """, unsafe_allow_html=True)
+
+    # -------------------------
+    # Who this is for (vertical, line by line)
+    # -------------------------
+    st.markdown('<div class="subheader small-gap">Who this is for</div>', unsafe_allow_html=True)
+
+    roles = [
+        ("Claims Analysts", "Need to identify and review high-risk claims efficiently.", "solution"),
+        ("Business Stakeholders", "Rely on analytics to translate raw claims data into decisions.", "role-business"),
+        ("Policy Stakeholders", "Need reliable answers to insurance questions via an AI assistant.", "role-policy"),
+    ]
+
+    for title, desc, cls in roles:
+        st.markdown(f"""
+        <div class="card wrap {cls}">
+          <h4>{title}</h4>
+          <p>{desc}</p>
+        </div>
+        """, unsafe_allow_html=True)
+
+# Call render when this page runs
+render()

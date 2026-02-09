@@ -3,6 +3,7 @@ import streamlit as st
 import pandas as pd
 
 from src.data import load_medical_insurance, get_validation_report
+from src.metrics import kpi_strip
 from src.viz import charges_boxplot, charges_histogram, numeric_boxplots
 
 
@@ -11,13 +12,46 @@ def _load_data():
     return load_medical_insurance()
 
 
+@st.cache_data
+def _kpis(df):
+    return kpi_strip(df)
+
+
 def render():
     st.title("Data Quality & Integrity")
+
+    # Neutral metric card style (no colored edges/glow) for this page only
+    st.markdown(
+        """
+        <style>
+        /* Key Metrics: neutral cards on Data Quality page */
+        [data-testid="stMetric"] {
+            background-color: #ffffff !important;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.08) !important;
+            border: 1px solid rgba(0,0,0,0.06) !important;
+            border-left: none !important;
+            border-radius: 8px;
+            padding: 1rem;
+        }
+        </style>
+        """,
+        unsafe_allow_html=True,
+    )
+
     try:
         df = _load_data()
+        kpis = _kpis(df)
     except Exception as e:
         st.error(str(e))
         return
+
+    st.subheader("Key Metrics")
+    c1, c2, c3, c4 = st.columns(4)
+    c1.metric("Row count", f"{kpis['row_count']:,}")
+    c2.metric("Median charges", f"${kpis['median_charges']:,.0f}")
+    c3.metric("95th Percentile charges", f"${kpis['p95_charges']:,.0f}")
+    c4.metric("Smoker %", f"{kpis['smoker_pct']:.1f}%")
+
     report = get_validation_report(df)
     st.subheader("Columns and Data types")
     st.dataframe(pd.DataFrame(report["schema"].items(), columns=["Column", "Dtype"]), use_container_width=True, hide_index=True)
